@@ -5,8 +5,7 @@
 ### 运行方式
 
 1. 修改 ``` com.rxf113.miraiqqbot.chat.MiraiConfig ``` 类里的 qq. 密码 和 群号。
-2. 从浏览器控制台请求的请求头，或者 application -> cookie 复制出 __Secure-next-auth.session-token 的 value。
-   copy到 ``` com.rxf113.miraiqqbot.chat.MiraiConfig ``` 的变量 ```SESSION_TOKEN```
+2. 去 https://platform.openai.com/account/api-keys 创建一个 SECRET KEY。然后将key复制到 com.rxf113.miraiqqbot.chat.MiraiConfig类的getAnswerByChatGPT()方法中
 3. 运行 springboot 项目即可
 
 ### other
