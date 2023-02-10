@@ -122,9 +122,9 @@ public class MiraiConfig implements SmartInitializingSingleton {
             CompletionRequest completionRequest = CompletionRequest.builder()
                     .prompt(query)
                     .model("text-davinci-003")
-                    .presencePenalty(2.0)
-                    .frequencyPenalty(2.0)
-                    .temperature(0.9)
+//                    .presencePenalty(2.0)
+//                    .frequencyPenalty(2.0)
+//                    .temperature(0.9)
                     .maxTokens(255)
                     .build();
             CompletionResult completionResult = service.createCompletion(completionRequest);
