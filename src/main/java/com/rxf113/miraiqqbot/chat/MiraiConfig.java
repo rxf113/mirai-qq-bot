@@ -15,6 +15,7 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -118,7 +119,10 @@ public class MiraiConfig implements SmartInitializingSingleton {
     public String getAnswerByChatGPT(String query) {
         //2023-02-07 更新: 将copy网页参数的方式，修改为使用官方提供的接口
         try {
-            OpenAiService service = new OpenAiService("需要自己去 https://platform.openai.com/account/api-keys 创建一个 SECRET KEY");
+            OpenAiService service = new OpenAiService("需要自己去 https://platform.openai.com/account/api-keys 创建一个 SECRET KEY",
+                    //超时时间 20s, 如果内容较多可以增大
+                    Duration.ofSeconds(20));
+
             CompletionRequest completionRequest = CompletionRequest.builder()
                     .prompt(query)
                     .model("text-davinci-003")
