@@ -72,12 +72,13 @@ public class MiraiConfig implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, (event) -> {
+        bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
             //收到的消息 message
             MessageChain message = event.getMessage();
             //判断是艾特我的
             int atIdx = -1;
             for (int i = 0; i < message.size(); i++) {
+                //等于 if (message.get(i) instanceof At at && at.getTarget() == QQ_NUMBER), 兼容低版本java
                 if (message.get(i) instanceof At && ((At) message.get(i)).getTarget() == QQ_NUMBER) {
                     atIdx = i;
                     break;
