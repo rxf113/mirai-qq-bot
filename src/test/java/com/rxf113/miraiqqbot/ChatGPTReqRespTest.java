@@ -1,22 +1,38 @@
 package com.rxf113.miraiqqbot;
 
-import com.theokanning.openai.OpenAiService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
+import com.theokanning.openai.service.OpenAiService;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.Test;
+import retrofit2.Retrofit;
 import retrofit2.http.HEAD;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.time.Duration;
 import java.util.stream.Collectors;
+
+import static com.theokanning.openai.service.OpenAiService.*;
 
 class ChatGPTReqRespTest {
 
     @Test
     void testOpenAiService() {
-        OpenAiService service = new OpenAiService("需要自己去 https://platform.openai.com/account/api-keys 创建一个 SECRET KEY",
-                //超时时间 20s
-                Duration.ofSeconds(20));
+
+        ObjectMapper mapper = defaultObjectMapper();
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 7890));
+        OkHttpClient client = defaultClient("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",
+                Duration.ofSeconds(120))
+                .newBuilder()
+                .proxy(proxy)
+                .build();
+        OpenAiApi api = defaultRetrofit(client, mapper).create(OpenAiApi.class);
+        OpenAiService service = new OpenAiService(api);
+
         CompletionRequest completionRequest = CompletionRequest.builder()
                 .prompt("c语言写一个冒泡排序")
                 .model("text-davinci-003")
@@ -24,11 +40,9 @@ class ChatGPTReqRespTest {
 //                .presencePenalty(2.0)
 //                .frequencyPenalty(2.0)
 //                .temperature(0.9)
-                .maxTokens(512)
+                .maxTokens(255)
                 .build();
         CompletionResult completionResult = service.createCompletion(completionRequest);
-
-        //System.out.println(completionResult.getChoices().toString());
 
         String result = completionResult.getChoices()
                 .stream()

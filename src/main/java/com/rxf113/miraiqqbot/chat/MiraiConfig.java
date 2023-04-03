@@ -1,6 +1,7 @@
 package com.rxf113.miraiqqbot.chat;
 
-import com.theokanning.openai.OpenAiService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
@@ -9,15 +10,21 @@ import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.*;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.theokanning.openai.service.OpenAiService.defaultClient;
+import static com.theokanning.openai.service.OpenAiService.defaultRetrofit;
 
 @Configuration
 public class MiraiConfig implements SmartInitializingSingleton {
@@ -117,12 +124,28 @@ public class MiraiConfig implements SmartInitializingSingleton {
 
     }
 
+
+    ObjectMapper mapper = new ObjectMapper();
+
     public String getAnswerByChatGPT(String query) {
         //2023-02-07 更新: 将copy网页参数的方式，修改为使用官方提供的接口
         try {
-            OpenAiService service = new OpenAiService("需要自己去 https://platform.openai.com/account/api-keys 创建一个 SECRET KEY",
-                    //超时时间 20s, 如果内容较多可以增大
-                    Duration.ofSeconds(20));
+//            //使用代理的情况
+//            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 7890));
+//            OkHttpClient client = defaultClient("需要自己去 https://platform.openai.com/account/api-keys 创建一个 SECRET KEY",
+//                    Duration.ofSeconds(120))
+//                    .newBuilder()
+//                    .proxy(proxy)
+//                    .build();
+
+            //不适用代理的情况
+            OkHttpClient client = defaultClient("需要自己去 https://platform.openai.com/account/api-keys 创建一个 SECRET KEY",
+                    Duration.ofSeconds(120))
+                    .newBuilder()
+                    .build();
+
+            OpenAiApi api = defaultRetrofit(client, mapper).create(OpenAiApi.class);
+            com.theokanning.openai.service.OpenAiService service = new com.theokanning.openai.service.OpenAiService(api);
 
             CompletionRequest completionRequest = CompletionRequest.builder()
                     .prompt(query)
